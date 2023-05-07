@@ -3,9 +3,14 @@
 import { debounce } from "lodash";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { INITIAL_PAGINATION_LIMIT } from "~/app/constants";
-import { Pokemon } from "~/app/page";
-import { getIsScrollFinished } from "~/app/utils";
+import {
+  INITIAL_PAGINATION_LIMIT,
+  INITIAL_PAGINATION_OFFSET,
+  PAGINATION_OFFSET,
+} from "~/app/constants";
+import { Pokemon, getPokemons } from "~/app/page";
+import { PokemonType, pokemonColors } from "~/app/utils/pokemonColors";
+import { getIsScrollFinished } from "~/app/utils/scroll";
 
 type ListProps = {
   pokemons: Pokemon[];
@@ -16,11 +21,27 @@ export const List = ({ pokemons }: ListProps) => {
 
   const [paginationInfo, setPaginationInfo] = useState({
     limit: INITIAL_PAGINATION_LIMIT,
-    offset: 0,
+    offset: INITIAL_PAGINATION_OFFSET,
   });
 
+  const updateFetchedPokemons = async () => {
+    setPaginationInfo((oldInfo) => ({
+      ...oldInfo,
+      offset: oldInfo.offset + PAGINATION_OFFSET,
+    }));
+    const newPokemons = await getPokemons(
+      INITIAL_PAGINATION_LIMIT,
+      paginationInfo.offset + PAGINATION_OFFSET
+    );
+    setFetchedPokemons((oldPokemons) => [...oldPokemons, ...newPokemons]);
+  };
+
   useEffect(() => {
-    const debouncedScrollFn = debounce(getIsScrollFinished, 1000);
+    const debouncedScrollFn = debounce(() => {
+      if (getIsScrollFinished()) {
+        updateFetchedPokemons();
+      }
+    }, 1000);
 
     window.addEventListener("scroll", debouncedScrollFn);
     return () => {
@@ -44,7 +65,13 @@ export const List = ({ pokemons }: ListProps) => {
           <p className="font-medium capitalize text-gray-900">{pokemon.name}</p>
           <div className="mt-2 flex items-center gap-2">
             {pokemon.types.map((type) => (
-              <div className="rounded-xl bg-green-500 p-2" key={type.slot}>
+              <div
+                className="rounded-xl px-4 py-2"
+                style={{
+                  backgroundColor: pokemonColors[type.type.name as PokemonType],
+                }}
+                key={type.slot}
+              >
                 {type.type.name}
               </div>
             ))}

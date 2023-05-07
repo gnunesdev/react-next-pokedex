@@ -1,1 +1,3 @@
 export const INITIAL_PAGINATION_LIMIT = 50;
+export const INITIAL_PAGINATION_OFFSET = 0;
+export const PAGINATION_OFFSET = 50;

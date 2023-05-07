@@ -1,6 +1,6 @@
 export const getIsScrollFinished = () => {
-  const is =
+  const isFinished =
     window.innerHeight + window.scrollY >= document.body.offsetHeight - 200;
 
-  console.log(is);
+  return isFinished;
 };

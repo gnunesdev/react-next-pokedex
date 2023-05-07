@@ -1,5 +1,8 @@
 import { List } from "./components/List";
-import { INITIAL_PAGINATION_LIMIT } from "./constants";
+import {
+  INITIAL_PAGINATION_LIMIT,
+  INITIAL_PAGINATION_OFFSET,
+} from "./constants";
 
 interface SimplePokemon {
   name: string;
@@ -23,9 +26,9 @@ export interface Pokemon {
   };
 }
 
-export async function getPokemon(
+export async function getPokemons(
   limit: number,
-  offset = 0
+  offset = INITIAL_PAGINATION_OFFSET
 ): Promise<Pokemon[]> {
   const pokemons = await fetch(
     `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`
@@ -43,7 +46,7 @@ export async function getPokemon(
 }
 
 export default async function Home() {
-  const pokemons = await getPokemon(INITIAL_PAGINATION_LIMIT);
+  const pokemons = await getPokemons(INITIAL_PAGINATION_LIMIT);
 
   return (
     <div className="flex flex-col gap-12 bg-gray-200 p-4">
